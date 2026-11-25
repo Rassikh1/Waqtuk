@@ -221,7 +221,17 @@ $("inst").onclick=()=>{if(dp){dp.prompt();dp=null;return}
 const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
 mod(`<div class="pop">📲</div><h3>تثبيت التطبيق على هاتفك</h3><div style="text-align:right;line-height:2">${ios?"1️⃣ افتحي الرابط في <b>Safari</b><br>2️⃣ اضغطي زر المشاركة <b>⬆️</b> في الأسفل<br>3️⃣ اختاري <b>«إضافة إلى الشاشة الرئيسية»</b>":"1️⃣ افتحي الرابط في <b>Chrome</b><br>2️⃣ اضغطي قائمة النقاط الثلاث <b>⋮</b> أعلى المتصفح<br>3️⃣ اختاري <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>"}</div><p style="color:var(--mut);font-size:.85rem">سيظهر بعدها أيقونة على شاشتك ويفتح مثل أي تطبيق 🌟</p><div class="row"><button class="ok" id="ok">فهمت</button></div>`);$("ok").onclick=close};
 $("ep").closest(".row").before($("fut"));
-load();init();render();setInterval(sumTimes,20000);
+let skipMissed=false;
+function checkMissed(){if(skipMissed||$("modal").innerHTML.trim())return;const td=key(new Date());
+const p=S.tasks.filter(t=>!t.daily&&t.date<td&&st(t,t.date)!=="done"&&st(t,t.date)!=="moved");
+if(!p.length)return;
+const opts=dayList().map(d=>`<option value="${d.k}">${d.n} (${d.s})</option>`).join("");
+mod(`<div class="pop">🌅🌷</div><h3>صباح الخير! بقيت ${p.length} مهام من الأيام السابقة</h3><p>لا بأس، هذا يحدث للجميع. اختاري ماذا نفعل بها:</p><ul style="text-align:right;color:var(--mut)">${p.map(t=>`<li>${t.name} (${fmt(t.min)})</li>`).join("")}</ul><select id="mdy">${opts}</select><div class="row"><button class="ok" id="mmv">نقلها 📅</button></div><div class="row"><button class="soft" id="mlt">لاحقًا</button><button class="soft" id="mdl">حذفها 🗑</button></div>`);
+$("mlt").onclick=()=>{skipMissed=true;close()};
+$("mmv").onclick=()=>{const to=$("mdy").value;if(!to)return;close();p.forEach(t=>moveTask(t,t.date,to,t.min));S.sel=to;render()};
+$("mdl").onclick=()=>{if(!confirm("حذف هذه المهام نهائيًا؟"))return;S.tasks=S.tasks.filter(t=>!p.includes(t));close();render()}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){if(S.sel<key(new Date()))S.sel=key(new Date());render();checkMissed()}});
+load();init();render();checkMissed();setInterval(sumTimes,20000);
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 </script>
 </body>
