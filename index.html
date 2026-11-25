@@ -105,7 +105,11 @@ const forDay=d=>S.tasks.filter(t=>(t.daily?d>=t.from:t.date===d)&&st(t,d)!=="mov
 const total=d=>forDay(d).reduce((a,t)=>a+t.min,0);
 const fmt=m=>{const h=Math.floor(m/60),r=m%60;return h?(h+" س"+(r?" و"+r+" د":"")):r+" د"};
 const hrs=m=>(m/60).toFixed(1).replace(".0","");
-const durOpts=m=>{const a=[15,30,45,60,90,120,150,180];if(!a.includes(m)){a.push(m);a.sort((x,y)=>x-y)}return a.map(v=>`<option value="${v}" ${v===m?"selected":""}>⏱ ${fmt(v)}</option>`).join("")};
+const CUS='<option value="custom">✏️ مدة أخرى...</option>';
+const askDur=()=>{const r=prompt("اكتبي المدة بالدقائق (مثال: 10 أو 200):");if(r===null)return null;const n=parseInt(String(r).replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[^\d]/g,""),10);if(!n||n<1||n>1440){alert("اكتبي رقمًا صحيحًا بين 1 و 1440 دقيقة");return null}return n};
+const setCustom=(sel,n)=>{let o=[...sel.options].find(x=>x.value==String(n));if(!o){o=new Option("⏱ "+fmt(n),n);const c=[...sel.options].find(x=>x.value==="custom");sel.insertBefore(o,c)}sel.value=String(n)};
+const wireDur=sel=>{sel.dataset.prev=sel.value;sel.addEventListener("change",()=>{if(sel.value==="custom"){const n=askDur();if(n)setCustom(sel,n);else sel.value=sel.dataset.prev}sel.dataset.prev=sel.value})};
+const durOpts=m=>{const a=[15,30,45,60,90,120,150,180];if(!a.includes(m)){a.push(m);a.sort((x,y)=>x-y)}return a.map(v=>`<option value="${v}" ${v===m?"selected":""}>⏱ ${fmt(v)}</option>`).join("")+CUS};
 function mv(id,dir){const ids=forDay(S.sel).map(t=>t.id),i=ids.indexOf(+id),j=i+dir;if(j<0||j>=ids.length)return;const a=S.tasks.findIndex(t=>t.id==ids[i]),b=S.tasks.findIndex(t=>t.id==ids[j]);[S.tasks[a],S.tasks[b]]=[S.tasks[b],S.tasks[a]];render()}
 function fillPre(){$("fpre").innerHTML='<option value="">اختاري من القائمة الجاهزة...</option>'+S.pre.map(p=>`<option>${p}</option>`).join("");$("pre").innerHTML='<option value="">اختاري من القائمة الجاهزة...</option>'+S.pre.map(p=>`<option>${p}</option>`).join("")}
 function editPre(){
@@ -125,8 +129,8 @@ const dupOn=(t,k)=>S.tasks.find(x=>x!==t&&x.name===t.name&&(x.daily?k>=x.from:x.
 function tgl(id){const t=get(id);if(t.daily){t.daily=false;t.date=S.sel}else{t.daily=true;t.from=t.date;S.tasks=S.tasks.filter(o=>o===t||o.daily||o.name!==t.name||o.date<t.date)}render()}
 function init(){
 fillPre();
-$("dur").innerHTML=[15,30,45,60,90,120,150,180].map(m=>`<option value="${m}">⏱ ${fmt(m)}</option>`).join("");
-$("dur").value=30;$("fdur").innerHTML=$("dur").innerHTML;$("fdur").value=30;const tm=new Date();tm.setDate(tm.getDate()+1);$("fdate").min=key(tm);
+$("dur").innerHTML=[15,30,45,60,90,120,150,180].map(m=>`<option value="${m}">⏱ ${fmt(m)}</option>`).join("")+CUS;
+$("dur").value=30;$("fdur").innerHTML=$("dur").innerHTML;$("fdur").value=30;wireDur($("dur"));wireDur($("fdur"));const tm=new Date();tm.setDate(tm.getDate()+1);$("fdate").min=key(tm);
 $("dsel").innerHTML=dayList().map(d=>`<option value="${d.k}">${d.n} (${d.s})</option>`).join("");
 }
 function render(){
@@ -184,7 +188,7 @@ if(s){const t=get(s.dataset.s);startTimer(t.id,t.min)}
 const u=e.target.closest("[data-u]"),w=e.target.closest("[data-w]");if(u)mv(u.dataset.u,-1);if(w)mv(w.dataset.w,1);
 const r=e.target.closest("[data-r]");if(r)tgl(r.dataset.r);
 if(x&&confirm("حذف هذه المهمة؟")){S.tasks=S.tasks.filter(t=>t.id!=x.dataset.x);render()}};
-$("list").onchange=e=>{if(e.target.dataset.d){get(e.target.dataset.d).min=+e.target.value;render();return}const c=e.target.dataset.c;if(c){const t=get(c);t.st=t.st||{};if(e.target.checked)setDone(c,S.sel);else{delete t.st[S.sel];render()}}};
+$("list").onchange=e=>{if(e.target.dataset.d){if(e.target.value==="custom"){const n=askDur();if(n)get(e.target.dataset.d).min=n;render();return}get(e.target.dataset.d).min=+e.target.value;render();return}const c=e.target.dataset.c;if(c){const t=get(c);t.st=t.st||{};if(e.target.checked)setDone(c,S.sel);else{delete t.st[S.sel];render()}}};
 $("add").onclick=()=>{const n=$("cus").value.trim()||$("pre").value;if(!n){alert("اختاري مهمة أو اكتبيها أولًا");return}
 const dk=$("dsel").value,dl=$("daily").checked;
 if(S.tasks.some(t=>t.name===n&&(t.daily?dk>=t.from:t.date===dk)&&st(t,dk)!=="moved")){alert("هذه المهمة موجودة بالفعل في هذا اليوم ✋");return}
