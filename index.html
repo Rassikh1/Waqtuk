@@ -75,7 +75,6 @@ h3{margin:0 0 8px;font-size:1.05rem}
 <div class="card" id="sum"></div>
 <div id="list"></div>
 <button class="fin" id="end">🌙 إنهاء اليوم</button>
-<label class="l" id="phl" style="order:5;margin:10px 4px;font-size:.9rem"><input type="checkbox" id="ph"> 📱 عند الضغط على «ابدئي» افتحي مؤقّت الهاتف أيضًا (أندرويد)</label>
 <div class="card">
 <h3>➕ إضافة مهمة</h3>
 <select id="pre"></select>
@@ -148,23 +147,25 @@ const cols=["#4da3ff","#ff7a59","#a77bff","#19b5a5","#ffc83d"];
 $("list").innerHTML=ts.length?ts.map(t=>{const d=st(t,S.sel)==="done";return `<div class="task ${d?"done":""}" style="border-right-color:${d?"":cols[t.id%5]}"><div class="ar"><button data-u="${t.id}">▲</button><button data-w="${t.id}">▼</button></div><input type="checkbox" class="chk" data-c="${t.id}" ${d?"checked":""}><div class="nm">${t.name}<div class="meta">${d?"⏱ "+fmt(t.min):`<select class="ds" data-d="${t.id}">${durOpts(t.min)}</select>`} ${t.daily?"· 🔁 يوميًا":""}</div></div>${d?"":`<button class="go" data-s="${t.id}">▶ ابدئي</button>`}<button class="x" data-r="${t.id}" title="تكرار يوميًا" style="font-size:1.1rem;${t.daily?"opacity:1":"opacity:.3;filter:grayscale(1)"}">🔁</button><button class="x" data-x="${t.id}">✕</button></div>`}).join(""):'<div class="empty">لا توجد مهام في هذا اليوم 🌸</div>';
 save()}
 function sumTimes(){const n=new Date(),f=x=>x.toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"});if(!$("nowt"))return;const rem=forDay(S.sel).filter(t=>st(t,S.sel)!=="done").reduce((a,t)=>a+t.min,0);$("nowt").textContent=f(n);if(!rem){$("endl").textContent="لا مهام متبقية 🎉";$("endt").textContent=""}else{const e=new Date(n.getTime()+rem*60000);$("endl").textContent=S.sel===key(n)?"تنتهين تقريبًا عند":"لو بدأتِ الآن تنتهين عند";$("endt").textContent=f(e)+(key(e)!==key(n)?" (بعد منتصف الليل)":"")}}
-function phoneTimer(m,n){try{const a=document.createElement("a");a.href="intent:#Intent;action=android.intent.action.SET_TIMER;i.android.intent.extra.alarm.LENGTH="+Math.round(m*60)+";S.android.intent.extra.alarm.MESSAGE="+encodeURIComponent(n)+";b.android.intent.extra.alarm.SKIP_UI=false;end";document.body.appendChild(a);a.click();a.remove()}catch(e){}}
+let WL=null;async function keepAwake(){try{if(navigator.wakeLock)WL=await navigator.wakeLock.request("screen")}catch(e){}}
+function relAwake(){try{WL&&WL.release()}catch(e){}WL=null}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&T&&Date.now()<T.end)keepAwake()});
 function mod(h){$("modal").innerHTML=`<div class="ov"><div class="modal">${h}</div></div>`}
 const close=()=>{$("modal").innerHTML=""};
 const get=id=>S.tasks.find(t=>t.id==id);
 function addTask(name,min,date,daily){S.tasks.push({id:S.nid++,name,min:+min,date,daily,from:date,st:{}})}
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();for(let i=0;i<8;i++){const o=c.createOscillator(),g=c.createGain();o.frequency.value=i%2?880:1100;o.connect(g);g.connect(c.destination);const t=c.currentTime+i*.4;g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.start(t);o.stop(t+.38)}}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,150,300,150,300])}catch(e){}}
 function startTimer(id,mins){
-const t=get(id);T={id,date:S.sel,end:Date.now()+mins*60000};if(S.ph&&/android/i.test(navigator.userAgent))phoneTimer(mins,t.name);
-mod(`<div class="pop">⏳</div><h3>${t.name}</h3><div class="clock" id="clk"></div><div class="row"><button class="ok" id="fd">✅ أنهيتها</button><button class="soft" id="cx">إيقاف العدّاد</button></div>`);
-$("fd").onclick=()=>{clearInterval(iv);setDone(id,T.date);close()};
-$("cx").onclick=()=>{clearInterval(iv);T=null;close()};
+const t=get(id);T={id,date:S.sel,end:Date.now()+mins*60000};if(true)keepAwake();
+mod(`<div class="pop">⏳</div><h3>${t.name}</h3><div class="clock" id="clk"></div><div class="tip" style="background:#fff7e0;border-radius:12px;padding:8px 10px;font-size:.8rem;margin:8px 0">🔔 ليرنّ التنبيه في وقته: اتركي التطبيق مفتوحًا والشاشة مضائة أثناء العدّاد، أو اضبطي مؤقّت هاتفك بنفسك.</div><div class="row"><button class="ok" id="fd">✅ أنهيتها</button><button class="soft" id="cx">إيقاف العدّاد</button></div>`);
+$("fd").onclick=()=>{clearInterval(iv);relAwake();setDone(id,T.date);close()};
+$("cx").onclick=()=>{clearInterval(iv);relAwake();T=null;close()};
 const tick=()=>{const l=Math.max(0,Math.round((T.end-Date.now())/1000));$("clk")&&($("clk").textContent=String(Math.floor(l/60)).padStart(2,"0")+":"+String(l%60).padStart(2,"0"));if(l<=0){clearInterval(iv);timeUp()}};
 tick();clearInterval(iv);iv=setInterval(tick,500)}
 function setDone(id,d){const t=get(id);t.st=t.st||{};t.st[d]="done";render();if(forDay(d).length&&forDay(d).every(x=>st(x,d)==="done"))cheer()}
 function cheer(){mod(`<div class="pop">🎉🥳🎊</div><h3>مبروك! أنجزتِ كل مهام اليوم</h3><p>أنتِ رائعة ومجتهدة، استمتعي بوقت راحتك 💐</p><div class="row"><button class="ok" id="ok">شكرًا 💖</button></div>`);$("ok").onclick=close}
 function dayOpts(from){return dayList().filter(d=>d.k>(from||"")).map(d=>`<option value="${d.k}">${d.n} (${d.s})</option>`).join("")}
-function timeUp(){
+function timeUp(){relAwake();
 beep();const t=get(T.id),date=T.date;
 mod(`<div class="pop">⏰</div><h3>انتهى وقت المهمة!</h3><p><b>${t.name}</b><br>انتقلي للمهمة التالية 🌼 ولو بقي منها شيء:</p><div class="row"><button class="ok" id="d1">✅ أنهيتها</button><button class="yel" id="d2">📅 أكملها غدًا أو يومًا آخر</button><button class="go" id="d3">➕ أكملها الآن</button></div>`);
 $("d1").onclick=()=>{setDone(t.id,date);close()};
@@ -210,7 +211,7 @@ $("inst").onclick=()=>{if(dp){dp.prompt();dp=null;return}
 const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
 mod(`<div class="pop">📲</div><h3>تثبيت التطبيق على هاتفك</h3><div style="text-align:right;line-height:2">${ios?"1️⃣ افتحي الرابط في <b>Safari</b><br>2️⃣ اضغطي زر المشاركة <b>⬆️</b> في الأسفل<br>3️⃣ اختاري <b>«إضافة إلى الشاشة الرئيسية»</b>":"1️⃣ افتحي الرابط في <b>Chrome</b><br>2️⃣ اضغطي قائمة النقاط الثلاث <b>⋮</b> أعلى المتصفح<br>3️⃣ اختاري <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>"}</div><p style="color:var(--mut);font-size:.85rem">سيظهر بعدها أيقونة على شاشتك ويفتح مثل أي تطبيق 🌟</p><div class="row"><button class="ok" id="ok">فهمت</button></div>`);$("ok").onclick=close};
 $("ep").closest(".row").before($("fut"));
-load();$("ph").checked=!!S.ph;$("ph").onchange=()=>{S.ph=$("ph").checked;save()};if(!/android/i.test(navigator.userAgent))$("phl").style.display="none";init();render();setInterval(sumTimes,20000);
+load();init();render();setInterval(sumTimes,20000);
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 </script>
 </body>
