@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>وقتك ثمين لا تضيّعيه</title>
+<meta name="theme-color" content="#fff4d6">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192x192.png">
+<link rel="apple-touch-icon" href="icon-192x192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="وقتك ثمين">
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg1:#fff4d6;--bg2:#ffe3ec;--ink:#3a3355;--mut:#7d7599;--card:#fff;--c1:#ff7a59;--c2:#19b5a5;--c3:#ffc83d;--c4:#a77bff;--c5:#4da3ff}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Tajawal","Segoe UI",Tahoma,sans-serif;color:var(--ink);background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,#dff6ff);min-height:100vh;padding:14px 14px 40px}
+.wrap{max-width:640px;margin:auto;display:flex;flex-direction:column}
+.wrap>.card{order:8}
+#days{order:2}#list{order:3}#sum{order:4}#end{order:5}#bc{order:6}
+.wrap>.card:last-child{order:7}
+#fut{box-shadow:none;background:#faf7ff;margin:12px 0}#inst{order:10}
+h1{font-size:1.5rem;margin:6px 0 2px;text-align:center;color:var(--c1)}
+.sub{text-align:center;color:var(--mut);font-size:.9rem;margin-bottom:12px}
+.days{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px}
+.day{flex:0 0 auto;min-width:68px;background:#fff;border:2px solid transparent;border-radius:16px;padding:8px 6px;text-align:center;cursor:pointer;font:inherit;color:var(--ink);box-shadow:0 2px 8px #0001}
+.day b{display:block;font-size:.85rem}.day small{color:var(--mut);font-size:.75rem}
+.day.on{background:var(--c2);color:#fff;border-color:#fff}.day.on small{color:#e8fffb}
+.card{background:var(--card);border-radius:20px;padding:14px;margin:10px 0;box-shadow:0 4px 14px #7b5cff14}
+.stat{display:flex;align-items:center;gap:12px}
+.big{font-size:2rem;font-weight:800}
+.badge{display:inline-block;padding:3px 12px;border-radius:99px;font-weight:700;font-size:.85rem;color:#fff}
+.bar{height:10px;background:#eee8f7;border-radius:9px;overflow:hidden;margin:10px 0 6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--c2),var(--c3));border-radius:9px;transition:width .4s}
+.tip{font-size:.92rem;line-height:1.7;margin-top:6px}
+.warn{background:#fff0e8;border:2px dashed var(--c1);color:#b93d1c;border-radius:14px;padding:10px;margin-top:8px;font-weight:700;font-size:.9rem}
+.task{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:10px 12px;margin:8px 0;border-right:6px solid var(--c5);box-shadow:0 2px 8px #0000000d}
+.task.done{opacity:.55;border-right-color:var(--c2)}.task.done .nm{text-decoration:line-through}
+.task .nm{flex:1;font-weight:700}.task .meta{font-size:.78rem;color:var(--mut);font-weight:500}
+.chk{width:26px;height:26px;accent-color:var(--c2)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:8px 12px;font-weight:700}
+.go{background:var(--c1);color:#fff}.ok{background:var(--c2);color:#fff}.soft{background:#efe9ff;color:var(--c4)}.yel{background:var(--c3);color:#5a4300}
+.x{background:#ffe3e3;color:#e53935;padding:4px 10px;font-size:1.1rem;font-weight:800;border-radius:10px}
+.x[data-r]{background:none;color:inherit;padding:4px 6px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.row>*{flex:1}
+input,select{font:inherit;padding:9px;border-radius:12px;border:2px solid #e9e1fb;background:#fff;color:var(--ink);width:100%}
+label.l{display:flex;align-items:center;gap:8px;font-weight:700}label.l input{width:20px;height:20px;accent-color:var(--c4)}
+h3{margin:0 0 8px;font-size:1.05rem}
+.ov{position:fixed;inset:0;background:#3a335566;display:flex;align-items:center;justify-content:center;padding:16px;z-index:9}
+.modal{background:#fff;border-radius:24px;padding:20px;max-width:420px;width:100%;text-align:center;max-height:90vh;overflow:auto}
+.clock{font-size:3.6rem;font-weight:800;color:var(--c1);font-variant-numeric:tabular-nums;direction:ltr}
+.modal .row button{flex:1 1 100%}
+.pop{font-size:3rem}
+.fin{width:100%;margin-top:10px;background:linear-gradient(90deg,var(--c4),var(--c5));color:#fff;padding:12px;font-size:1rem}
+.empty{text-align:center;color:var(--mut);padding:18px}
+.ar{display:flex;flex-direction:column;gap:2px}.ar button{padding:1px 8px;font-size:.8rem;background:#efe9ff;color:var(--c4);border-radius:8px;line-height:1.3}
+.ds{width:auto;padding:3px 6px;font-size:.78rem;margin-top:4px;border-radius:9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>⏳ وقتك ثمين لا تضيّعيه</h1>
+<div class="sub">خطّطي يومك بتوازن، وأنجزي بمرح ✨</div>
+<button class="yel" id="inst" style="display:block;margin:0 auto 10px">📲 تثبيت كتطبيق</button>
+<details class="card" id="bc" open><summary style="cursor:pointer;font-weight:800;font-size:1.05rem">🗓️ كيف تحبّين تنظيم أسبوعك؟</summary><div class="tip">لديكِ طريقتان:<br>1️⃣ <b>تضعين كل مهامك</b> ثم تضغطي «وزّعي بتوازن» فيوزّعها التطبيق بنفسه على الأيام.<br>2️⃣ <b>تضعين لكل يوم مهامه</b> حسب ما يناسبك: اختاري اليوم من الأسفل عند الإضافة.</div><div class="row"><button class="soft" id="bal">⚖️ وزّعي بتوازن</button><button class="soft" id="ub">↩️ إلغاء التوزيع</button></div></details>
+<div class="days" id="days"></div>
+<details class="card" id="fut"><summary style="cursor:pointer;font-weight:800;font-size:.8rem;white-space:nowrap">📌 مهمة مبرمجة ليوم آخر خارج الأسبوع <span id="fcount"></span></summary>
+<div class="tip">لا تريدين نسيان مهمة بعد أسبوع أو شهر؟ اختاري المهمة والتاريخ، وستظهر تلقائيًا في يومها عندما يقترب.</div>
+<select id="fpre" style="margin-top:8px"></select>
+<input id="fcus" placeholder="أو اكتبي مهمة جديدة..." style="margin-top:8px">
+<div class="row"><input type="date" id="fdate"><select id="fdur"></select></div>
+<div class="row"><button class="go" id="fadd">📌 برمجة المهمة</button></div>
+<div id="flist"></div></details>
+<div class="card" id="sum"></div>
+<div id="list"></div>
+<button class="fin" id="end">🌙 إنهاء اليوم</button>
+<div class="card">
+<h3>➕ إضافة مهمة</h3>
+<select id="pre"></select>
+<input id="cus" placeholder="أو اكتبي مهمة جديدة..." style="margin-top:8px">
+<div class="row">
+<select id="dur"></select>
+<select id="dsel"></select>
+</div>
+<label class="l"><input type="checkbox" id="daily"> 🔁 تتكرر يوميًا</label>
+<div class="row"><button class="go" id="add">إضافة المهمة</button></div>
+<div class="row"><button class="yel" id="ep">✏️ تعديل القائمة الجاهزة</button></div>
+</div>
+</div>
+<div id="modal"></div>
+<script>
+const PRE0=["ورد قرآني","الصلاة على وقتها","ورد أذكار تسبيح وحوقلة وغيرها","غسل الملابس","خياطة ما هو مقطّع","تنظيف أقمشة المطبخ","طي الملابس","فرز الملابس شتوية وصيفية","تمشيط الشعر","الطبخ","إعداد حلوى","غسل الأواني","ترتيب المطبخ","تنظيف الدوش","فرز الصوابين والمنظفات","فرز أواني المطبخ","غسل الثلاجة","ترتيب الخضر","رحي الملح","كتابة نواقص لوازم البيت","إعداد تحلية لقهوة العصر","تنظيف الطاولات وتلميعها","غسل الزرابي","مسح الدار","فرش الزرابي","فرز خزانة الأحذية","عمل تطبيقات موبايل واقتراح تسميتها","الاتصال بأمي وإخوتي","الاتصال بالأصدقاء","نزهة مع الأهل","ترتيب الأفرشة","تعلّم لغة","تدريس","🌿 أذكار الصباح والمساء","🌿 شرب الماء والمشي","🌿 قراءة كتاب","🌿 رياضة خفيفة","🌿 تخطيط وجبات الأسبوع","🌿 ريّ النباتات","🌿 مراجعة الميزانية والمصاريف","🌿 غسل الستائر","🌿 تنظيف النوافذ","🌿 تنظيف الأفران والمايكرويف","🌿 ترتيب الأدوية","🌿 صلة رحم وزيارة","🌿 تأمل وراحة 10 دقائق"];
+const PRE=["ورد قرآني","الصلاة على وقتها","أذكار الصباح والمساء","ورد أذكار تسبيح وحوقلة...","عمل خارج البيت","غسل الملابس","ترتيب الخزانة","طي الملابس","فرز الملابس شتوية وصيفية","العناية الشخصية: بشرة، شعر...","الطبخ","إعداد حلوى","غسل الأواني","ترتيب المطبخ","تنظيف الحمام","فرز المنظفات","فرز أواني المطبخ","غسل الثلاجة","ترتيب الخضر","رحي الملح","كتابة نواقص لوازم البيت","إعداد تحلية","تنظيف الطاولات والأسطح","غسل الزرابي","تنظيف المنزل","ترتيب الأفرشة","فرز خزانة الأحذية","إنشاء تطبيقات موبايل","الاتصال بأمي وإخوتي","الاتصال بالأصدقاء","نزهة مع الأهل","ترتيب المكتب","تعلّم لغة","تدريس","تطوير هواية: كتابة، رسم...","شرب الماء والمشي","قراءة كتاب","رياضة خفيفة","تخطيط وجبات الأسبوع","الاعتناء بالنباتات","مراجعة الميزانية والمصاريف","غسل الستائر","تنظيف النوافذ والشرفة","تنظيف الأفران والمايكرويف","ترتيب الأدوية","صلة رحم وزيارة","تأمل وراحة 10 دقائق"];
+PRE.forEach((p,i)=>PRE[i]=p.replace(/فرز/g,"تنظيم"));
+const AR=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const $=id=>document.getElementById(id);
+let S={tasks:[],sel:null,nid:1},T=null,iv=null;
+const key=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const dayList=()=>{const a=[];for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);a.push({k:key(d),n:i==0?"اليوم":i==1?"غدًا":AR[d.getDay()],s:d.getDate()+"/"+(d.getMonth()+1)})}return a};
+function load(){try{const r=localStorage.getItem("waqtuk");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}if(!S.sel||S.sel<key(new Date()))S.sel=key(new Date());if(!Array.isArray(S.pre))S.pre=PRE.slice();if(S.pv!==3){S.pre=PRE.slice();S.pv=3}S.pre=S.pre.map(p=>p==="العناية الشخصية"?"العناية الشخصية: بشرة، شعر...":p);S.pre=S.pre.map(p=>p.replace(/فرز/g,"تنظيم"));S.tasks.forEach(t=>t.name=t.name.replace(/فرز/g,"تنظيم"))}
+function save(){setTimeout(sumTimes,0);try{localStorage.setItem("waqtuk",JSON.stringify(S))}catch(e){}}
+const st=(t,d)=>t.st&&t.st[d];
+const forDay=d=>S.tasks.filter(t=>(t.daily?d>=t.from:t.date===d)&&st(t,d)!=="moved");
+const total=d=>forDay(d).reduce((a,t)=>a+t.min,0);
+const fmt=m=>{const h=Math.floor(m/60),r=m%60;return h?(h+" س"+(r?" و"+r+" د":"")):r+" د"};
+const hrs=m=>(m/60).toFixed(1).replace(".0","");
+const durOpts=m=>{const a=[15,30,45,60,90,120,150,180];if(!a.includes(m)){a.push(m);a.sort((x,y)=>x-y)}return a.map(v=>`<option value="${v}" ${v===m?"selected":""}>⏱ ${fmt(v)}</option>`).join("")};
+function mv(id,dir){const ids=forDay(S.sel).map(t=>t.id),i=ids.indexOf(+id),j=i+dir;if(j<0||j>=ids.length)return;const a=S.tasks.findIndex(t=>t.id==ids[i]),b=S.tasks.findIndex(t=>t.id==ids[j]);[S.tasks[a],S.tasks[b]]=[S.tasks[b],S.tasks[a]];render()}
+function fillPre(){$("fpre").innerHTML='<option value="">اختاري من القائمة الجاهزة...</option>'+S.pre.map(p=>`<option>${p}</option>`).join("");$("pre").innerHTML='<option value="">اختاري من القائمة الجاهزة...</option>'+S.pre.map(p=>`<option>${p}</option>`).join("")}
+function editPre(){
+const draw=()=>mod(`<h3>✏️ القائمة الجاهزة</h3><div style="text-align:right;max-height:45vh;overflow:auto">${S.pre.map((p,i)=>`<div class="task" style="margin:5px 0;padding:6px 10px"><div class="ar"><button data-pu="${i}">▲</button><button data-pw="${i}">▼</button></div><div class="nm" style="font-size:.9rem">${p}</div><button class="x" data-pd="${i}">✕</button></div>`).join("")}</div><div class="row"><input id="np" placeholder="مهمة جديدة..."><button class="ok" id="pa" style="flex:0 0 auto">إضافة</button></div><div class="row"><button class="soft" id="pr">↺ استعادة الأصلية</button><button class="go" id="pc">تم</button></div>`);
+const sw=(i,j)=>{if(j<0||j>=S.pre.length)return;[S.pre[i],S.pre[j]]=[S.pre[j],S.pre[i]]};
+$("modal").onclick=e=>{const b=e.target.closest("button");if(!b)return;const d=b.dataset;let ch=true;
+if(d.pu!==undefined)sw(+d.pu,+d.pu-1);
+else if(d.pw!==undefined)sw(+d.pw,+d.pw+1);
+else if(d.pd!==undefined)S.pre.splice(+d.pd,1);
+else if(b.id==="pa"){const v=$("np").value.trim();if(v)S.pre.push(v)}
+else if(b.id==="pr"){if(confirm("استعادة القائمة الأصلية؟"))S.pre=PRE.slice()}
+else if(b.id==="pc"){close();fillPre();save();return}
+else ch=false;
+if(ch){save();draw()}};
+draw()}
+const dupOn=(t,k)=>S.tasks.find(x=>x!==t&&x.name===t.name&&(x.daily?k>=x.from:x.date===k)&&st(x,k)!=="moved");
+function tgl(id){const t=get(id);if(t.daily){t.daily=false;t.date=S.sel}else{t.daily=true;t.from=t.date;S.tasks=S.tasks.filter(o=>o===t||o.daily||o.name!==t.name||o.date<t.date)}render()}
+function init(){
+fillPre();
+$("dur").innerHTML=[15,30,45,60,90,120,150,180].map(m=>`<option value="${m}">⏱ ${fmt(m)}</option>`).join("");
+$("dur").value=30;$("fdur").innerHTML=$("dur").innerHTML;$("fdur").value=30;const tm=new Date();tm.setDate(tm.getDate()+1);$("fdate").min=key(tm);
+$("dsel").innerHTML=dayList().map(d=>`<option value="${d.k}">${d.n} (${d.s})</option>`).join("");
+}
+function render(){
+const D=dayList();
+$("days").innerHTML=D.map(d=>`<button class="day ${d.k===S.sel?"on":""}" data-k="${d.k}"><b>${d.n}</b><small>${d.s} · ${hrs(total(d.k))}س</small></button>`).join("");
+$("dsel").value=S.sel;$("ub").disabled=!S.prev;$("ub").style.opacity=S.prev?1:.4;
+const lw=D[6].k,fu=S.tasks.filter(t=>!t.daily&&t.date>lw).sort((a,b)=>a.date<b.date?-1:1);
+$("fcount").textContent=fu.length?"("+fu.length+")":"";
+$("flist").innerHTML=fu.map(t=>`<div class="task" style="padding:8px 10px"><div class="nm">${t.name}<div class="meta">📅 ${new Date(t.date+"T00:00:00").toLocaleDateString("ar",{weekday:"long",day:"numeric",month:"long",year:"numeric"})} · ⏱ ${fmt(t.min)}</div></div><button class="x" data-x="${t.id}">✕</button></div>`).join("");
+const ts=forDay(S.sel),tot=total(S.sel),dn=ts.filter(t=>st(t,S.sel)==="done").reduce((a,t)=>a+t.min,0);
+let lab,col,tip;
+if(tot===0){lab="فارغ";col="#9aa0c8";tip="أضيفي مهام ليومك 🌸"}
+else if(tot<360){lab="خفيف";col="#19b5a5";tip="يومك خفيف! يمكنك إضافة مهام أخرى 🌟"}
+else if(tot<=480){lab="متوسط";col="#f5a623";tip="يوم متوسط، التزمي بوقت كل عمل وستنجزين كل شيء 👍"}
+else{lab="مشحون";col="#ff6b6b";tip="يوم مشحون! يُفضّل تخفيف الحمل ونقل بعض المهام ليوم آخر 🍃"}
+$("sum").innerHTML=`<div class="stat"><div><div class="big">${hrs(tot)} <small style="font-size:1rem">ساعة</small></div><span class="badge" style="background:${col}">${lab}</span></div><div style="flex:1;font-size:.85rem;color:var(--mut)">المنجز: ${hrs(dn)} س من ${hrs(tot)} س<br>🕐 الآن: <b id="nowt"></b><br>🏁 <span id="endl"></span> <b id="endt"></b></div></div><div class="bar"><i style="width:${tot?dn/tot*100:0}%"></i></div><div class="tip">${tip}</div>${tot>600?'<div class="warn">⚠️ تجاوزتِ 10 ساعات! جسمك يستحق الراحة، أجّلي بعض المهام 💤</div>':""}`;
+const cols=["#4da3ff","#ff7a59","#a77bff","#19b5a5","#ffc83d"];
+$("list").innerHTML=ts.length?ts.map(t=>{const d=st(t,S.sel)==="done";return `<div class="task ${d?"done":""}" style="border-right-color:${d?"":cols[t.id%5]}"><div class="ar"><button data-u="${t.id}">▲</button><button data-w="${t.id}">▼</button></div><input type="checkbox" class="chk" data-c="${t.id}" ${d?"checked":""}><div class="nm">${t.name}<div class="meta">${d?"⏱ "+fmt(t.min):`<select class="ds" data-d="${t.id}">${durOpts(t.min)}</select>`} ${t.daily?"· 🔁 يوميًا":""}</div></div>${d?"":`<button class="go" data-s="${t.id}">▶ ابدئي</button>`}<button class="x" data-r="${t.id}" title="تكرار يوميًا" style="font-size:1.1rem;${t.daily?"opacity:1":"opacity:.3;filter:grayscale(1)"}">🔁</button><button class="x" data-x="${t.id}">✕</button></div>`}).join(""):'<div class="empty">لا توجد مهام في هذا اليوم 🌸</div>';
+save()}
+function sumTimes(){const n=new Date(),f=x=>x.toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"});if(!$("nowt"))return;const rem=forDay(S.sel).filter(t=>st(t,S.sel)!=="done").reduce((a,t)=>a+t.min,0);$("nowt").textContent=f(n);if(!rem){$("endl").textContent="لا مهام متبقية 🎉";$("endt").textContent=""}else{const e=new Date(n.getTime()+rem*60000);$("endl").textContent=S.sel===key(n)?"تنتهين تقريبًا عند":"لو بدأتِ الآن تنتهين عند";$("endt").textContent=f(e)+(key(e)!==key(n)?" (بعد منتصف الليل)":"")}}
+function mod(h){$("modal").innerHTML=`<div class="ov"><div class="modal">${h}</div></div>`}
+const close=()=>{$("modal").innerHTML=""};
+const get=id=>S.tasks.find(t=>t.id==id);
+function addTask(name,min,date,daily){S.tasks.push({id:S.nid++,name,min:+min,date,daily,from:date,st:{}})}
+function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();for(let i=0;i<8;i++){const o=c.createOscillator(),g=c.createGain();o.frequency.value=i%2?880:1100;o.connect(g);g.connect(c.destination);const t=c.currentTime+i*.4;g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.start(t);o.stop(t+.38)}}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,150,300,150,300])}catch(e){}}
+function startTimer(id,mins){
+const t=get(id);T={id,date:S.sel,end:Date.now()+mins*60000};
+mod(`<div class="pop">⏳</div><h3>${t.name}</h3><div class="clock" id="clk"></div><div class="row"><button class="ok" id="fd">✅ أنهيتها</button><button class="soft" id="cx">إيقاف العدّاد</button></div>`);
+$("fd").onclick=()=>{clearInterval(iv);setDone(id,T.date);close()};
+$("cx").onclick=()=>{clearInterval(iv);T=null;close()};
+const tick=()=>{const l=Math.max(0,Math.round((T.end-Date.now())/1000));$("clk")&&($("clk").textContent=String(Math.floor(l/60)).padStart(2,"0")+":"+String(l%60).padStart(2,"0"));if(l<=0){clearInterval(iv);timeUp()}};
+tick();clearInterval(iv);iv=setInterval(tick,500)}
+function setDone(id,d){const t=get(id);t.st=t.st||{};t.st[d]="done";render();if(forDay(d).length&&forDay(d).every(x=>st(x,d)==="done"))cheer()}
+function cheer(){mod(`<div class="pop">🎉🥳🎊</div><h3>مبروك! أنجزتِ كل مهام اليوم</h3><p>أنتِ رائعة ومجتهدة، استمتعي بوقت راحتك 💐</p><div class="row"><button class="ok" id="ok">شكرًا 💖</button></div>`);$("ok").onclick=close}
+function dayOpts(from){return dayList().filter(d=>d.k>(from||"")).map(d=>`<option value="${d.k}">${d.n} (${d.s})</option>`).join("")}
+function timeUp(){
+beep();const t=get(T.id),date=T.date;
+mod(`<div class="pop">⏰</div><h3>انتهى وقت المهمة!</h3><p><b>${t.name}</b><br>انتقلي للمهمة التالية 🌼 ولو بقي منها شيء:</p><div class="row"><button class="ok" id="d1">✅ أنهيتها</button><button class="yel" id="d2">📅 أكملها غدًا أو يومًا آخر</button><button class="go" id="d3">➕ أكملها الآن</button></div>`);
+$("d1").onclick=()=>{setDone(t.id,date);close()};
+$("d2").onclick=()=>{mod(`<h3>📅 برمجة التكملة</h3><p>اختاري اليوم والوقت المتبقي التقريبي:</p><select id="nd">${dayOpts(date)}</select><div class="row"><select id="nm">${[15,30,45,60,90,120,150,180].map(m=>`<option value="${m}">${fmt(m)}</option>`).join("")}</select></div><div class="row"><button class="ok" id="sv">حفظ</button></div>`);
+$("sv").onclick=()=>{moveTask(t,date,$("nd").value,+$("nm").value);close();T=null}};
+$("d3").onclick=()=>{mod(`<h3>⚠️ تنبيه</h3><p>التمديد سيأخذ من وقت المهام الأخرى اليوم. اختاري مدة الوقت الإضافي:</p><div class="row">${[10,15,30,45,60].map(m=>`<button class="yel" data-m="${m}">+ ${m} دقيقة</button>`).join("")}</div>`);
+$("modal").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>startTimer(t.id,+b.dataset.m))}}
+function moveTask(t,from,to,min){
+t.st=t.st||{};
+if(t.daily){t.st[from]="moved";addTask(t.name+" (تكملة)",min,to,false)}
+else{const o=dupOn(t,to);if(o){if(!o.daily)o.min+=min;S.tasks=S.tasks.filter(x=>x!==t)}else{t.date=to;t.from=to;t.min=min}}
+render()}
+$("days").onclick=e=>{const b=e.target.closest("[data-k]");if(b){S.sel=b.dataset.k;render()}};
+$("list").onclick=e=>{const s=e.target.closest("[data-s]"),x=e.target.closest("[data-x]");
+if(s){const t=get(s.dataset.s);startTimer(t.id,t.min)}
+const u=e.target.closest("[data-u]"),w=e.target.closest("[data-w]");if(u)mv(u.dataset.u,-1);if(w)mv(w.dataset.w,1);
+const r=e.target.closest("[data-r]");if(r)tgl(r.dataset.r);
+if(x&&confirm("حذف هذه المهمة؟")){S.tasks=S.tasks.filter(t=>t.id!=x.dataset.x);render()}};
+$("list").onchange=e=>{if(e.target.dataset.d){get(e.target.dataset.d).min=+e.target.value;render();return}const c=e.target.dataset.c;if(c){const t=get(c);t.st=t.st||{};if(e.target.checked)setDone(c,S.sel);else{delete t.st[S.sel];render()}}};
+$("add").onclick=()=>{const n=$("cus").value.trim()||$("pre").value;if(!n){alert("اختاري مهمة أو اكتبيها أولًا");return}
+const dk=$("dsel").value,dl=$("daily").checked;
+if(S.tasks.some(t=>t.name===n&&(t.daily?dk>=t.from:t.date===dk)&&st(t,dk)!=="moved")){alert("هذه المهمة موجودة بالفعل في هذا اليوم ✋");return}
+if(dl)S.tasks=S.tasks.filter(o=>o.daily||o.name!==n||o.date<dk);
+addTask(n,$("dur").value,dk,dl);$("cus").value="";$("pre").value="";$("daily").checked=false;S.sel=$("dsel").value;render()};
+$("bal").onclick=()=>{const D=dayList().map(d=>d.k);const load={};
+D.forEach(k=>load[k]=S.tasks.filter(t=>t.daily&&k>=t.from).reduce((a,t)=>a+t.min,0)+S.tasks.filter(t=>!t.daily&&t.date===k&&st(t,k)==="done").reduce((a,t)=>a+t.min,0));
+const mv=S.tasks.filter(t=>!t.daily&&D.includes(t.date)&&st(t,t.date)!=="done").sort((a,b)=>b.min-a.min);S.prev={};mv.forEach(t=>S.prev[t.id]=t.date);
+mv.forEach(t=>{let b=D[0];D.forEach(k=>{if(load[k]<load[b])b=k});t.date=b;t.from=b;load[b]+=t.min});
+render();alert("تم توزيع المهام بتوازن على الأيام ⚖️")};
+$("end").onclick=()=>{const p=forDay(S.sel).filter(t=>st(t,S.sel)!=="done");
+if(!forDay(S.sel).length){alert("لا مهام في هذا اليوم بعد");return}
+if(!p.length){cheer();return}
+mod(`<div class="pop">💪🌷</div><h3>بقيت ${p.length} مهام لم تكتمل</h3><p>لا بأس! ما أنجزتِه اليوم جميل، وغدًا فرصة جديدة. اختاري يومًا لبرمجتها:</p><ul style="text-align:right;color:var(--mut)">${p.map(t=>`<li>${t.name} (${fmt(t.min)})</li>`).join("")}</ul><select id="nd">${dayOpts(S.sel)||"<option value=''>لا أيام متاحة</option>"}</select><div class="row"><button class="ok" id="sv">برمجتها 📅</button><button class="soft" id="no">لاحقًا</button></div>`);
+$("no").onclick=close;
+$("sv").onclick=()=>{const to=$("nd").value;if(!to)return;p.forEach(t=>moveTask(t,S.sel,to,t.min));close()}};
+$("ub").onclick=()=>{if(!S.prev)return;S.tasks.forEach(t=>{if(S.prev[t.id]&&!t.daily){t.date=S.prev[t.id];t.from=t.date}});S.prev=null;render();alert("تم إلغاء التوزيع ✅ عادت المهام إلى أيامها قبل التوزيع")};
+$("flist").onclick=e=>{const x=e.target.closest("[data-x]");if(x&&confirm("حذف هذه المهمة؟")){S.tasks=S.tasks.filter(t=>t.id!=x.dataset.x);render()}};
+$("fadd").onclick=()=>{const n=$("fcus").value.trim()||$("fpre").value,d=$("fdate").value;if(!n){alert("اختاري مهمة أو اكتبيها أولًا");return}if(!d){alert("اختاري التاريخ");return}if(d<=key(new Date())){alert("اختاري تاريخًا بعد اليوم");return}if(S.tasks.some(t=>t.name===n&&!t.daily&&t.date===d)){alert("هذه المهمة موجودة بالفعل في هذا اليوم ✋");return}addTask(n,$("fdur").value,d,false);$("fcus").value="";$("fpre").value="";$("fdate").value="";if(d<=dayList()[6].k)S.sel=d;render();alert("تمت برمجة المهمة 📌")};
+$("ep").onclick=editPre;
+let dp=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e});
+if(window.matchMedia&&matchMedia("(display-mode: standalone)").matches||navigator.standalone)$("inst").style.display="none";
+$("inst").onclick=()=>{if(dp){dp.prompt();dp=null;return}
+const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+mod(`<div class="pop">📲</div><h3>تثبيت التطبيق على هاتفك</h3><div style="text-align:right;line-height:2">${ios?"1️⃣ افتحي الرابط في <b>Safari</b><br>2️⃣ اضغطي زر المشاركة <b>⬆️</b> في الأسفل<br>3️⃣ اختاري <b>«إضافة إلى الشاشة الرئيسية»</b>":"1️⃣ افتحي الرابط في <b>Chrome</b><br>2️⃣ اضغطي قائمة النقاط الثلاث <b>⋮</b> أعلى المتصفح<br>3️⃣ اختاري <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>"}</div><p style="color:var(--mut);font-size:.85rem">سيظهر بعدها أيقونة على شاشتك ويفتح مثل أي تطبيق 🌟</p><div class="row"><button class="ok" id="ok">فهمت</button></div>`);$("ok").onclick=close};
+$("ep").closest(".row").before($("fut"));
+load();init();render();setInterval(sumTimes,20000);
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
