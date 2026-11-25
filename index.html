@@ -254,7 +254,7 @@ let dp=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault()
 if(window.matchMedia&&matchMedia("(display-mode: standalone)").matches||navigator.standalone)$("inst").style.display="none";
 $("inst").onclick=()=>{if(dp){dp.prompt();dp=null;return}
 const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
-mod(`<div class="pop">📲</div><h3>تثبيت التطبيق على هاتفك</h3><div style="text-align:right;line-height:2">${ios?"1️⃣ افتحي الرابط في <b>Safari</b><br>2️⃣ اضغطي زر المشاركة <b>⬆️</b> في الأسفل<br>3️⃣ اختاري <b>«إضافة إلى الشاشة الرئيسية»</b>":"1️⃣ افتحي الرابط في <b>Chrome</b><br>2️⃣ اضغطي قائمة النقاط الثلاث <b>⋮</b> أعلى المتصفح<br>3️⃣ اختاري <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>"}</div><p style="color:var(--mut);font-size:.85rem">سيظهر بعدها أيقونة على شاشتك ويفتح مثل أي تطبيق 🌟</p><div class="row"><button class="ok" id="ok">فهمت</button></div>`);$("ok").onclick=close};
+mod(`<div class="pop">📲</div><h3>تثبيت التطبيق على هاتفك</h3><div style="text-align:right;line-height:2">${ios?"1️⃣ افتحي الرابط في <b>Safari</b><br>2️⃣ اضغطي زر المشاركة <b>⬆️</b> في الأسفل<br>3️⃣ اختاري <b>«إضافة إلى الشاشة الرئيسية»</b>":"1️⃣ افتحي الرابط في <b>Chrome</b><br>2️⃣ انزلي إلى <b>آخر الصفحة</b><br>3️⃣ اختاري <b>«تثبيت التطبيق»</b>"}</div><p style="color:var(--mut);font-size:.85rem">سيظهر بعدها أيقونة على شاشتك ويفتح مثل أي تطبيق 🌟</p><div class="row"><button class="ok" id="ok">فهمت</button></div>`);$("ok").onclick=close};
 $("ep").closest(".row").before($("fut"));
 let skipMissed=false;
 function checkMissed(){if(skipMissed||$("modal").innerHTML.trim())return;const td=key(new Date());
