@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>وقتك ثمين لا تضيّعيه</title>
 <meta name="theme-color" content="#fff4d6">
+<script>try{if(localStorage.getItem("waqtuk-theme")==="dark"){document.documentElement.setAttribute("data-theme","dark");document.querySelector('meta[name="theme-color"]').content="#1a1730"}}catch(e){}</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192x192.png">
 <link rel="apple-touch-icon" href="icon-192x192.png">
@@ -66,9 +67,31 @@ html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
 .task .go{flex:1 1 auto}
 .task .meta{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
 .task .meta select{flex:0 1 auto;min-width:0;max-width:100%}
+/* زر الثيم */
+body{position:relative}
+#th{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:12px;width:42px;height:42px;padding:0;border-radius:50%;background:#fff;font-size:1.35rem;line-height:1;box-shadow:0 2px 8px #0002;z-index:5;display:flex;align-items:center;justify-content:center}
+/* الثيم الداكن */
+html[data-theme="dark"]{color-scheme:dark;--bg1:#1a1730;--bg2:#251f40;--ink:#ece8ff;--mut:#aaa3c9;--card:#2a2547}
+html[data-theme="dark"] body{background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,#12213a);background-attachment:fixed}
+html[data-theme="dark"] #th{background:#3a3459;box-shadow:0 2px 8px #0006}
+html[data-theme="dark"] .day{background:#332d54;box-shadow:0 2px 8px #0004}
+html[data-theme="dark"] .day.on{background:var(--c2);color:#fff;border-color:#ffffff55}
+html[data-theme="dark"] .card{box-shadow:0 4px 14px #0004}
+html[data-theme="dark"] #fut{background:#231f3b}
+html[data-theme="dark"] .task{background:#332d54;box-shadow:0 2px 8px #0004}
+html[data-theme="dark"] .bar{background:#3d3763}
+html[data-theme="dark"] input,html[data-theme="dark"] select{background:#1f1b38;border-color:#4a4373;color:var(--ink)}
+html[data-theme="dark"] .modal{background:#2a2547;color:var(--ink)}
+html[data-theme="dark"] .soft,html[data-theme="dark"] .ar button{background:#3d3763;color:#cdb8ff}
+html[data-theme="dark"] .x{background:#4a2a35;color:#ff8a8a}
+html[data-theme="dark"] .x[data-r]{background:none}
+html[data-theme="dark"] .warn{background:#3b2a2a;color:#ffab91}
+html[data-theme="dark"] .tip[style*="fff7e0"]{background:#3a3220!important}
+html[data-theme="dark"] .yel{color:#4a3700}
 </style>
 </head>
 <body>
+<button id="th" type="button" aria-label="تبديل الثيم"></button>
 <div class="wrap">
 <h1>⏳ وقتك ثمين لا تضيّعيه</h1>
 <div class="sub">استعيني بالله، وأكثري التسبيح والحوقلة 🤍</div>
@@ -142,6 +165,7 @@ else ch=false;
 if(ch){save();draw()}};
 draw()}
 const dupOn=(t,k)=>S.tasks.find(x=>x!==t&&x.name===t.name&&(x.daily?k>=x.from:x.date===k)&&st(x,k)!=="moved");
+function postpone(id){const t=get(id),d=new Date(S.sel+"T00:00:00");d.setDate(d.getDate()+1);moveTask(t,S.sel,key(d),t.min)}
 function tgl(id){const t=get(id);if(t.daily){t.daily=false;t.date=S.sel}else{t.daily=true;t.from=t.date;S.tasks=S.tasks.filter(o=>o===t||o.daily||o.name!==t.name||o.date<t.date)}render()}
 function init(){
 fillPre();
@@ -164,7 +188,7 @@ else if(tot<=720){lab="متوسط";col="#f5a623";tip="يوم متوسط، الت
 else{lab="مشحون";col="#ff6b6b";tip="يوم مشحون! يُفضّل تخفيف الحمل ونقل بعض المهام ليوم آخر 🍃"}
 $("sum").innerHTML=`<div class="stat"><div><div class="big">${hrs(tot)} <small style="font-size:1rem">ساعة</small></div><span class="badge" style="background:${col}">${lab}</span></div><div style="flex:1;font-size:.85rem;color:var(--mut)">المنجز: ${hrs(dn)} س من ${hrs(tot)} س<br>🕐 الآن: <b id="nowt"></b><br>🏁 <span id="endl"></span> <b id="endt"></b></div></div><div class="bar"><i style="width:${tot?dn/tot*100:0}%"></i></div><div class="tip">${tip}</div>${tot>720?'<div class="warn">⚠️ تجاوزتِ 12 ساعة! جسمك يستحق الراحة، أجّلي بعض المهام 💤</div>':""}`;
 const cols=["#4da3ff","#ff7a59","#a77bff","#19b5a5","#ffc83d"];
-$("list").innerHTML=ts.length?ts.map(t=>{const d=st(t,S.sel)==="done";return `<div class="task ${d?"done":""}" style="border-right-color:${d?"":cols[t.id%5]}"><div class="ar"><button data-u="${t.id}">▲</button><button data-w="${t.id}">▼</button></div><input type="checkbox" class="chk" data-c="${t.id}" ${d?"checked":""}><div class="nm">${t.name}<div class="meta">${d?"⏱ "+fmt(t.min):`<select class="ds" data-d="${t.id}">${durOpts(t.min)}</select>${[15,30,45,60,90,120,150,180].includes(t.min)?"":`<button class="x" data-cd="${t.id}" title="حذف المدة اليدوية" style="padding:0 7px;font-size:.9rem;margin-inline-start:4px">×</button>`}`} ${t.daily?"· 🔁 يوميًا":""}</div></div>${d?"":`<button class="go" data-s="${t.id}">▶ ابدئي</button>`}<button class="x" data-r="${t.id}" title="تكرار يوميًا" style="font-size:1.1rem;${t.daily?"opacity:1":"opacity:.3;filter:grayscale(1)"}">🔁</button><button class="x" data-x="${t.id}">✕</button></div>`}).join(""):'<div class="empty">لا توجد مهام في هذا اليوم 🌸</div>';
+$("list").innerHTML=ts.length?ts.map(t=>{const d=st(t,S.sel)==="done";return `<div class="task ${d?"done":""}" style="border-right-color:${d?"":cols[t.id%5]}"><div class="ar"><button data-u="${t.id}">▲</button><button data-w="${t.id}">▼</button></div><input type="checkbox" class="chk" data-c="${t.id}" ${d?"checked":""}><div class="nm">${t.name}<div class="meta">${d?"⏱ "+fmt(t.min):`<select class="ds" data-d="${t.id}">${durOpts(t.min)}</select>${[15,30,45,60,90,120,150,180].includes(t.min)?"":`<button class="x" data-cd="${t.id}" title="حذف المدة اليدوية" style="padding:0 7px;font-size:.9rem;margin-inline-start:4px">×</button>`}`} ${t.daily?"· 🔁 يوميًا":""}</div></div>${d?"":`<button class="go" data-s="${t.id}">▶ ابدئي</button><button class="yel" data-p="${t.id}" title="تأجيلها ليوم غد">📅 غدًا</button>`}<button class="x" data-r="${t.id}" title="تكرار يوميًا" style="font-size:1.1rem;${t.daily?"opacity:1":"opacity:.3;filter:grayscale(1)"}">🔁</button><button class="x" data-x="${t.id}">✕</button></div>`}).join(""):'<div class="empty">لا توجد مهام في هذا اليوم 🌸</div>';
 save()}
 function sumTimes(){const n=new Date(),f=x=>x.toLocaleTimeString("ar",{hour:"2-digit",minute:"2-digit"});if(!$("nowt"))return;const rem=forDay(S.sel).filter(t=>st(t,S.sel)!=="done").reduce((a,t)=>a+t.min,0);$("nowt").textContent=f(n);if(!rem){$("endl").textContent="لا مهام متبقية 🎉";$("endt").textContent=""}else{const e=new Date(n.getTime()+rem*60000);$("endl").textContent=S.sel===key(n)?"تنتهين تقريبًا عند":"لو بدأتِ الآن تنتهين عند";$("endt").textContent=f(e)+(key(e)!==key(n)?" (بعد منتصف الليل)":"")}}
 let WL=null;async function keepAwake(){try{if(navigator.wakeLock)WL=await navigator.wakeLock.request("screen")}catch(e){}}
@@ -201,6 +225,7 @@ render()}
 $("days").onclick=e=>{const b=e.target.closest("[data-k]");if(b){S.sel=b.dataset.k;render()}};
 $("list").onclick=e=>{const s=e.target.closest("[data-s]"),x=e.target.closest("[data-x]");
 if(s){const t=get(s.dataset.s);startTimer(t.id,t.min)}
+const pp=e.target.closest("[data-p]");if(pp)postpone(pp.dataset.p);
 const u=e.target.closest("[data-u]"),w=e.target.closest("[data-w]");if(u)mv(u.dataset.u,-1);if(w)mv(w.dataset.w,1);
 const r=e.target.closest("[data-r]");if(r)tgl(r.dataset.r);const cd=e.target.closest("[data-cd]");if(cd){get(cd.dataset.cd).min=30;render()}
 if(x&&confirm("حذف هذه المهمة؟")){S.tasks=S.tasks.filter(t=>t.id!=x.dataset.x);render()}};
@@ -241,6 +266,9 @@ $("mlt").onclick=()=>{skipMissed=true;close()};
 $("mmv").onclick=()=>{const to=$("mdy").value;if(!to)return;close();p.forEach(t=>moveTask(t,t.date,to,t.min));S.sel=to;render()};
 $("mdl").onclick=()=>{if(!confirm("حذف هذه المهام نهائيًا؟"))return;S.tasks=S.tasks.filter(t=>!p.includes(t));close();render()}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){if(S.sel<key(new Date()))S.sel=key(new Date());render();checkMissed()}});
+function applyTheme(dark){const r=document.documentElement;if(dark)r.setAttribute("data-theme","dark");else r.removeAttribute("data-theme");$("th").textContent=dark?"☀️":"🌙";$("th").title=dark?"الوضع الفاتح":"الوضع الداكن";const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=dark?"#1a1730":"#fff4d6"}
+applyTheme(document.documentElement.getAttribute("data-theme")==="dark");
+$("th").onclick=()=>{const d=document.documentElement.getAttribute("data-theme")!=="dark";applyTheme(d);try{localStorage.setItem("waqtuk-theme",d?"dark":"light")}catch(e){}};
 load();init();render();checkMissed();setInterval(sumTimes,20000);
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 </script>
