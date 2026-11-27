@@ -277,7 +277,7 @@ function applyTheme(dark){const r=document.documentElement;if(dark)r.setAttribut
 applyTheme(document.documentElement.getAttribute("data-theme")==="dark");
 $("th").onclick=()=>{const d=document.documentElement.getAttribute("data-theme")!=="dark";applyTheme(d);try{localStorage.setItem("waqtuk-theme",d?"dark":"light")}catch(e){}};
 load();init();render();checkMissed();setInterval(sumTimes,20000);
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let rl=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!rl&&!T&&!$("modal").innerHTML.trim()){rl=true;location.reload()}});window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}
 </script>
 </body>
 </html>
