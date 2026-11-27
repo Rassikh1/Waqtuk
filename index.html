@@ -183,8 +183,8 @@ $("flist").innerHTML=fu.map(t=>`<div class="task" style="padding:8px 10px"><div 
 const ts=forDay(S.sel),tot=total(S.sel),dn=ts.filter(t=>st(t,S.sel)==="done").reduce((a,t)=>a+t.min,0);
 let lab,col,tip;
 if(tot===0){lab="فارغ";col="#9aa0c8";tip="أضيفي مهام ليومك 🌸"}
-else if(tot<360){lab="خفيف";col="#19b5a5";tip="يومك خفيف! يمكنك إضافة مهام أخرى 🌟"}
-else if(tot<=720){lab="متوسط";col="#f5a623";tip="يوم متوسط، التزمي بوقت كل عمل وستنجزين كل شيء 👍"}
+else if(tot<480){lab="خفيف";col="#19b5a5";tip="يومك خفيف! يمكنك إضافة مهام أخرى 🌟"}
+else if(tot<=960){lab="متوسط";col="#f5a623";tip="يوم متوسط، التزمي بوقت كل عمل وستنجزين كل شيء 👍"}
 else{lab="مشحون";col="#ff6b6b";tip="يوم مشحون! يُفضّل تخفيف الحمل ونقل بعض المهام ليوم آخر 🍃"}
 $("sum").innerHTML=`<div class="stat"><div><div class="big">${hrs(tot)} <small style="font-size:1rem">ساعة</small></div><span class="badge" style="background:${col}">${lab}</span></div><div style="flex:1;font-size:.85rem;color:var(--mut)">المنجز: ${hrs(dn)} س من ${hrs(tot)} س<br>🕐 الآن: <b id="nowt"></b><br>🏁 <span id="endl"></span> <b id="endt"></b></div></div><div class="bar"><i style="width:${tot?dn/tot*100:0}%"></i></div><div class="tip">${tip}</div>${tot>720?'<div class="warn">⚠️ تجاوزتِ 12 ساعة! جسمك يستحق الراحة، أجّلي بعض المهام 💤</div>':""}`;
 const cols=["#4da3ff","#ff7a59","#a77bff","#19b5a5","#ffc83d"];
