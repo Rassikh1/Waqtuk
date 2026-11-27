@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>وقتك ثمين لا تضيّعيه</title>
-<meta name="theme-color" content="#fff4d6">
+<meta name="theme-color" content="#2b2545">
 <script>try{if(localStorage.getItem("waqtuk-theme")==="dark"){document.documentElement.setAttribute("data-theme","dark");document.querySelector('meta[name="theme-color"]').content="#1a1730"}}catch(e){}</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192x192.png">
@@ -69,6 +69,8 @@ html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
 .task .meta select{flex:0 1 auto;min-width:0;max-width:100%}
 /* زر الثيم */
 body{position:relative}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:max(env(safe-area-inset-top,0px),24px);background:#2b2545;z-index:100;pointer-events:none}
+html[data-theme="dark"] body::before{background:#1a1730}
 #th{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:12px;width:42px;height:42px;padding:0;border-radius:50%;background:#fff;font-size:1.35rem;line-height:1;box-shadow:0 2px 8px #0002;z-index:5;display:flex;align-items:center;justify-content:center}
 /* الثيم الداكن */
 html[data-theme="dark"]{color-scheme:dark;--bg1:#1a1730;--bg2:#251f40;--ink:#ece8ff;--mut:#aaa3c9;--card:#2a2547}
@@ -270,7 +272,7 @@ $("mlt").onclick=()=>{skipMissed=true;close()};
 $("mmv").onclick=()=>{const to=$("mdy").value;if(!to)return;close();p.forEach(t=>moveTask(t,t.date,to,t.min));S.sel=to;render()};
 $("mdl").onclick=()=>{if(!confirm("حذف هذه المهام نهائيًا؟"))return;S.tasks=S.tasks.filter(t=>!p.includes(t));close();render()}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){if(S.sel<key(new Date()))S.sel=key(new Date());render();checkMissed()}});
-function applyTheme(dark){const r=document.documentElement;if(dark)r.setAttribute("data-theme","dark");else r.removeAttribute("data-theme");$("th").textContent=dark?"☀️":"🌙";$("th").title=dark?"الوضع الفاتح":"الوضع الداكن";const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=dark?"#1a1730":"#fff4d6"}
+function applyTheme(dark){const r=document.documentElement;if(dark)r.setAttribute("data-theme","dark");else r.removeAttribute("data-theme");$("th").textContent=dark?"☀️":"🌙";$("th").title=dark?"الوضع الفاتح":"الوضع الداكن";const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=dark?"#1a1730":"#2b2545"}
 applyTheme(document.documentElement.getAttribute("data-theme")==="dark");
 $("th").onclick=()=>{const d=document.documentElement.getAttribute("data-theme")!=="dark";applyTheme(d);try{localStorage.setItem("waqtuk-theme",d?"dark":"light")}catch(e){}};
 load();init();render();checkMissed();setInterval(sumTimes,20000);
