@@ -155,7 +155,7 @@ function fillPre(){$("fpre").innerHTML='<option value="">اختاري من ال�
 function nrm(x){return x.replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/ؤ/g,"و").replace(/ئ/g,"ي").toLowerCase()}
 function openPicker(sel){const draw=q=>{const n=nrm(q.trim()),items=S.pre.map((p,i)=>[p,i]).filter(x=>!n||nrm(x[0]).includes(n));return items.map(x=>`<button class="soft" data-pi="${x[1]}" style="width:100%;text-align:right;margin:3px 0;${sel.value===x[0]?"outline:2px solid var(--c1)":""}">${x[0]}</button>`).join("")||'<p style="color:var(--mut)">لا توجد نتائج 🔍</p>'};
 mod(`<h3>📋 اختاري من القائمة الجاهزة</h3><input id="psq" type="search" placeholder="🔍 ابحثي في القائمة..." autocomplete="off" style="width:100%;box-sizing:border-box"><div id="psl" style="text-align:right;max-height:45vh;overflow:auto;margin-top:8px">${draw("")}</div><div class="row"><button class="soft" id="psc">إلغاء الاختيار</button><button class="soft" id="psx">إغلاق</button></div>`);
-const close=()=>{$("modal").innerHTML=""},m=$("modal");$("psq").oninput=e=>{$("psl").innerHTML=draw(e.target.value)};
+const m=$("modal");$("psq").oninput=e=>{$("psl").innerHTML=draw(e.target.value)};
 $("psl").onclick=e=>{const b=e.target.closest("[data-pi]");if(b){sel.value=S.pre[+b.dataset.pi];close()}};
 $("psc").onclick=()=>{sel.value="";close()};$("psx").onclick=close;m.firstChild.onclick=e=>{if(e.target===m.firstChild)close()};$("psq").focus()}
 function setupPicker(){["pre","fpre"].forEach(id=>{const sel=$(id);if(sel.parentNode.className==="pk")return;const w=document.createElement("div");w.className="pk";w.style.position="relative";sel.parentNode.insertBefore(w,sel);w.appendChild(sel);const o=document.createElement("div");o.style.cssText="position:absolute;inset:0;cursor:pointer;z-index:2";o.onclick=()=>openPicker(sel);w.appendChild(o)})}
@@ -205,8 +205,9 @@ document.addEventListener("click",e=>{if(e.target&&e.target.id==="stn"){if(S.st)
 let WL=null;async function keepAwake(){try{if(navigator.wakeLock)WL=await navigator.wakeLock.request("screen")}catch(e){}}
 function relAwake(){try{WL&&WL.release()}catch(e){}WL=null}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&T&&Date.now()<T.end)keepAwake()});
-function mod(h){$("modal").innerHTML=`<div class="ov"><div class="modal">${h}</div></div>`}
-const close=()=>{$("modal").innerHTML=""};
+function mod(h){if(!$("modal").innerHTML.trim()){try{history.pushState({m:1},"")}catch(e){}}$("modal").innerHTML=`<div class="ov"><div class="modal">${h}</div></div>`}
+const close=()=>{const o=!!$("modal").innerHTML.trim();$("modal").innerHTML="";if(o&&history.state&&history.state.m){try{history.back()}catch(e){}}};
+window.addEventListener("popstate",()=>{if(!$("modal").innerHTML.trim())return;if($("clk")){try{history.pushState({m:1},"")}catch(e){}return}$("modal").innerHTML=""});
 const get=id=>S.tasks.find(t=>t.id==id);
 function addTask(name,min,date,daily){S.tasks.push({id:S.nid++,name,min:+min,date,daily,from:date,st:{}})}
 function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();for(let i=0;i<8;i++){const o=c.createOscillator(),g=c.createGain();o.frequency.value=i%2?880:1100;o.connect(g);g.connect(c.destination);const t=c.currentTime+i*.4;g.gain.setValueAtTime(.3,t);g.gain.exponentialRampToValueAtTime(.001,t+.35);o.start(t);o.stop(t+.38)}}catch(e){}try{navigator.vibrate&&navigator.vibrate([300,150,300,150,300])}catch(e){}}
